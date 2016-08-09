@@ -1,0 +1,65 @@
+# encoding: utf-8		
+from __future__ import unicode_literals
+
+from django.shortcuts import render
+from django.template import Context, RequestContext
+
+import os
+import pafy
+from pydub import AudioSegment
+
+# Create your views here.
+
+
+def index(request):
+
+    var = 'hello'
+    directory = os.path.join(os.path.expanduser('~'), '/home/djangosites/static/') # path to download folder
+    link = ''
+    thumb_link = '' 
+
+    if 'play' in request.GET and request.GET['play']:    
+
+        try:   
+  	    var = ''
+
+            play_url = request.GET['play']
+
+            video = pafy.new(play_url)
+
+            
+link = video.videoid + '.' + video.getbestaudio().extension
+	    
+
+            video.getbestaudio().download(filepath=directory + link)
+
+	    thumb_link = video.thumb
+	    
+           ### conver
+
+	    AudioSegment.from_file(filepath=directory + link).export("/output/file", format="mp3")          
+	            
+        except:
+
+            var = 'except'  
+	    
+           
+
+
+
+		
+    else:
+	play_url = 'Insert URL...'
+ 
+
+    return render(request, 'listen/index.html', {'var': var,
+						 'play_url': play_url,
+						 'link':  link,
+						 'thumb_link': thumb_link,
+								},
+                            context_instance=RequestContext(request))
+
+
+
+
+
